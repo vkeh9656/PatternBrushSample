@@ -8,6 +8,8 @@
 // CPatternBrushSampleDlg 대화 상자
 class CPatternBrushSampleDlg : public CDialogEx
 {
+private:
+	CBrush m_my_brush, m_num_brush;
 // 생성입니다.
 public:
 	CPatternBrushSampleDlg(CWnd* pParent = nullptr);	// 표준 생성자입니다.
@@ -30,4 +32,7 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };

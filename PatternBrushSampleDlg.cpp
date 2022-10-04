@@ -31,6 +31,8 @@ void CPatternBrushSampleDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CPatternBrushSampleDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 
@@ -45,7 +47,23 @@ BOOL CPatternBrushSampleDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
-	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	CBitmap my_bmp, num_bmp;
+	my_bmp.LoadBitmap(IDB_TIPS_IMAGE);
+	num_bmp.LoadBitmap(IDB_NUM);
+
+	m_my_brush.CreatePatternBrush(&my_bmp);
+	m_num_brush.CreatePatternBrush(&num_bmp);
+
+	my_bmp.DeleteObject();
+	
+	/*
+	CClientDC dc(this);
+	CDC mem_dc;
+	mem_dc.CreateCompatibleDC(&dc);
+	mem_dc.SelectObject(&my_bmp);
+
+	dc.BitBlt(0, 0, 48, 48, &mem_dc, 0, 0, SRCCOPY);
+	*/
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -56,9 +74,9 @@ BOOL CPatternBrushSampleDlg::OnInitDialog()
 
 void CPatternBrushSampleDlg::OnPaint()
 {
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
 	if (IsIconic())
-	{
-		CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+	{	
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
@@ -75,7 +93,10 @@ void CPatternBrushSampleDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		//CBrush *p_old_brush = dc.SelectObject(&m_my_brush);
+		dc.FillSolidRect(0, 0, 160, 48, RGB(218, 218, 218));
+		//dc.SelectObject(p_old_brush);
+		//CDialogEx::OnPaint();
 	}
 }
 
@@ -86,3 +107,38 @@ HCURSOR CPatternBrushSampleDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CPatternBrushSampleDlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+
+	CClientDC dc(this);
+
+	CBrush* p_old_brush = dc.SelectObject(&m_my_brush);
+	dc.SetBrushOrg(point.x - 24, point.y - 24);
+	dc.Ellipse(point.x-24, point.y-24, point.x+24, point.y+24);
+	dc.SelectObject(p_old_brush);
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+
+void CPatternBrushSampleDlg::OnMouseMove(UINT nFlags, CPoint point)
+{
+	if (nFlags & MK_LBUTTON)
+	{
+		if (point.x < 160 && point.y < 48)
+		{
+			CClientDC dc(this);
+
+			CBrush* p_old_brush = dc.SelectObject(&m_num_brush);
+			CGdiObject* p_old_pen = dc.SelectStockObject(NULL_PEN);
+			//dc.SelectStockObject(NULL_PEN); // 펜을 쓰지 않겠다. StockObject는 시스템이 미리 갖고있는 GDIOBJ
+			dc.Rectangle(point.x - 5, point.y - 5, point.x + 5, point.y + 5);
+			dc.SelectObject(p_old_brush);
+			dc.SelectObject(p_old_pen);
+		}
+	}
+
+	CDialogEx::OnMouseMove(nFlags, point);
+}

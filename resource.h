@@ -4,9 +4,9 @@
 //
 #define IDD_PATTERNBRUSHSAMPLE_DIALOG   102
 #define IDR_MAINFRAME                   128
-#define IDB_BITMAP1                     130
 #define IDB_TIPS_IMAGE                  130
 #define IDB_BITMAP2                     131
+#define IDB_NUM                         131
 
 // Next default values for new objects
 // 
